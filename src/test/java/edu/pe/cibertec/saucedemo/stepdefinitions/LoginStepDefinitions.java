@@ -17,6 +17,8 @@ import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static org.hamcrest.Matchers.*;
 
 public class LoginStepDefinitions {
+    private long startTime;
+    private long duration;
 
     @Given("{word} is on the SauceDemo login page")
     public void openLoginPage(String actorName) {
@@ -27,9 +29,11 @@ public class LoginStepDefinitions {
 
     @When("she logs in with username {string} and password {string}")
     public void loginWith(String username, String password) {
+        startTime = System.currentTimeMillis();
         OnStage.theActorInTheSpotlight().attemptsTo(
                 LoginAs.user(username).withPassword(password)
         );
+        duration = System.currentTimeMillis() - startTime;
     }
 
     @Then("she should be redirect to the inventory page")
@@ -60,40 +64,24 @@ public class LoginStepDefinitions {
         assertThat(page.locator("#login-button")).isVisible();
     }
 
-    @Then("the page load time should be greater than {int} milliseconds")
-    public void validarTiempo(int tiempo) {
-        OnStage.theActorInTheSpotlight().attemptsTo(
-                VerificarSesion.tiempoDeCargaMayor(tiempo)
-        );
+    @Then("the page load time should be greater than 3000 milliseconds")
+    public void validarTiempo() {
+        org.junit.Assert.assertTrue("Tiempo insuficinte: " + duration, duration > 3000);
     }
 
     @When("she navigates to the cart page")
     public void irAlCarrito() {
-
-        Page page = OnStage.theActorInTheSpotlight()
-                .abilityTo(BrowseTheWebWithPlaywright.class)
-                .getCurrentPage();
-
-        page.locator(".shopping_cart_link").click();
+        VerificarSesion.irAlCarrito();
     }
 
     @When("she navigates back to the inventory page")
     public void volverAlInventario() {
-
-        Page page = OnStage.theActorInTheSpotlight()
-                .abilityTo(BrowseTheWebWithPlaywright.class)
-                .getCurrentPage();
-
-        page.locator("#continue-shopping").click();
+        VerificarSesion.volverAlInventario();
+        VerificarSesion.inventoryListVisible();
     }
 
     @Then("she should still be logged in")
     public void sesionActiva() {
-
-        Page page = OnStage.theActorInTheSpotlight()
-                .abilityTo(BrowseTheWebWithPlaywright.class)
-                .getCurrentPage();
-
-        assertThat(page.locator(".shopping_cart_link")).isVisible();
+        VerificarSesion.sesionActiva();
     }
 }
