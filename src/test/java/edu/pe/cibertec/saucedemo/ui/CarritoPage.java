@@ -16,4 +16,6 @@ public class CarritoPage {
     public static String CART_BADGE = "[data-test='shopping-cart-badge']";
 
     public static String CART_ITEMS = "[data-test='inventory-item-name']";
+
+    public static String CHECKOUT_BUTTON = "[data-test='checkout']";
 }
