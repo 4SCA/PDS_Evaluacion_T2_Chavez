@@ -1,16 +1,18 @@
 package edu.pe.cibertec.saucedemo.stepdefinitions;
 
+import com.microsoft.playwright.Page;
 import edu.pe.cibertec.saucedemo.questions.TheErrorMessage;
 import edu.pe.cibertec.saucedemo.questions.ThePageTitle;
 import edu.pe.cibertec.saucedemo.tasks.LoginAs;
 import edu.pe.cibertec.saucedemo.tasks.OpenTheLoginPage;
+import edu.pe.cibertec.saucedemo.tasks.VerificarSesion;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.actors.OnStage;
 import net.serenitybdd.screenplay.playwright.abilities.BrowseTheWebWithPlaywright;
-
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static org.hamcrest.Matchers.*;
 
@@ -53,7 +55,45 @@ public class LoginStepDefinitions {
 
     @Then("she should remain on the login page")
     public void shouldRemainOnTheLoginPage() {
+        Page page = OnStage.theActorInTheSpotlight().abilityTo(BrowseTheWebWithPlaywright.class).getCurrentPage();
 
+        assertThat(page.locator("#login-button")).isVisible();
     }
 
+    @Then("the page load time should be greater than {int} milliseconds")
+    public void validarTiempo(int tiempo) {
+        OnStage.theActorInTheSpotlight().attemptsTo(
+                VerificarSesion.tiempoDeCargaMayor(tiempo)
+        );
+    }
+
+    @When("she navigates to the cart page")
+    public void irAlCarrito() {
+
+        Page page = OnStage.theActorInTheSpotlight()
+                .abilityTo(BrowseTheWebWithPlaywright.class)
+                .getCurrentPage();
+
+        page.locator(".shopping_cart_link").click();
+    }
+
+    @When("she navigates back to the inventory page")
+    public void volverAlInventario() {
+
+        Page page = OnStage.theActorInTheSpotlight()
+                .abilityTo(BrowseTheWebWithPlaywright.class)
+                .getCurrentPage();
+
+        page.locator("#continue-shopping").click();
+    }
+
+    @Then("she should still be logged in")
+    public void sesionActiva() {
+
+        Page page = OnStage.theActorInTheSpotlight()
+                .abilityTo(BrowseTheWebWithPlaywright.class)
+                .getCurrentPage();
+
+        assertThat(page.locator(".shopping_cart_link")).isVisible();
+    }
 }
